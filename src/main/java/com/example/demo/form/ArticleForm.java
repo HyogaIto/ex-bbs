@@ -6,7 +6,7 @@ package com.example.demo.form;
  * @author hyoga.ito
  *
  */
-public class AtricleForm {
+public class ArticleForm {
 	/** 投稿者名 */
 	private String name;
 	/** 投稿内容 */
