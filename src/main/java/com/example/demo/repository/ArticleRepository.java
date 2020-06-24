@@ -42,7 +42,7 @@ public class ArticleRepository {
 	 * @return 全件記事リスト
 	 */
 	public List<Article> findAll(){
-		String sql="select id,name,content from "+TABLE_NAME+" order by id;";
+		String sql="select id,name,content from "+TABLE_NAME+" order by id desc;";
 		List<Article> articleList=template.query(sql, ARTICLE_ROW_MAPPER);
 		return articleList;
 		

@@ -16,8 +16,17 @@
 <div th:each="article:${articles}">
 投稿者名：<span th:text="${article.name}"></span><br>
 投稿内容：<div th:text="${article.content}"></div>
+<br>
+<div th:each="comment:${article.commentList}">
+コメント者名：<span th:text="${comment.name}"></span><br>
+<div>コメント内容：</div>
+<div><strong th:text="${comment.content}"></strong></div>
+<br>
+</div>
+
 <hr>
- </div>
+</div>
+
 
 </body>
 </html>

@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.demo.domain.Article;
 import com.example.demo.form.ArticleForm;
 import com.example.demo.repository.ArticleRepository;
+import com.example.demo.repository.CommentRepository;
 
 /**
  * 掲示板画面の表示を行う.
@@ -22,10 +22,13 @@ import com.example.demo.repository.ArticleRepository;
 @Controller
 @RequestMapping("/bbs")
 public class ArticleController {
-	/** リポジトリの参照を注入 */
+	/** 記事リポジトリの参照を注入 */
 	@Autowired
 	private ArticleRepository articleRepository;
 
+	/** コメントリポジトリの参照を注入 */
+	@Autowired
+	private CommentRepository commentRepository;
 
 	/**
 	 * 掲示板画面を表示する.
@@ -35,18 +38,24 @@ public class ArticleController {
 	@RequestMapping("")
 	public String index(Model model) {
 		List<Article> articles = articleRepository.findAll();
-		List<Article> newOrderAticles=new ArrayList<>();
-		for(int i=0;i<articles.size();i++) {
-			newOrderAticles.add(i,articles.get(articles.size()-(i+1)));
+
+		for (Article article : articles) {
+			article.setCommentList(commentRepository.findByArticleId(article.getId()));
 		}
-		model.addAttribute("articles", newOrderAticles);
+
+		model.addAttribute("articles", articles);
 		return "ex-bbs";
 	}
 
-	/**	 */
+	/**
+	 * 記事投稿を行う.
+	 * 
+	 * @param form 投稿したい記事の内容
+	 * @return リダイレクト：掲示板画面
+	 */
 	@RequestMapping("insertArticle")
-	public String insertArticle(ArticleForm form){
-		Article article=new Article();
+	public String insertArticle(ArticleForm form) {
+		Article article = new Article();
 		BeanUtils.copyProperties(form, article);
 		articleRepository.insert(article);
 		return "redirect:/bbs/";
