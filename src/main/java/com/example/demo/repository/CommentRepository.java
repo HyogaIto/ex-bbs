@@ -45,18 +45,34 @@ public class CommentRepository {
 	 */
 	public List<Comment> findByArticleId(Integer articleId) {
 		String sql = "select id,name,content,article_id from " + TABLE_NAME + " "
-				+ " where article_id=:articleId";
+				+ " where article_id=:articleId order by id desc;";
 		SqlParameterSource param = new MapSqlParameterSource("articleId", articleId);
 		List<Comment> comments = template.query(sql, param, COMMENT_ROW_MAPPER);
 		return comments;
 
 	}
 	
+	/**
+	 * コメントを追加する.
+	 * 
+	 * @param comment　追加したいコメント
+	 */
 	public void insert(Comment comment) {
 		String sql="insert into "+TABLE_NAME+"(name,content,article_id) values(:name,:content,:articleId);";
 		SqlParameterSource param=new MapSqlParameterSource("name",comment.getName()).addValue("content", comment.getContent())
 				.addValue("articleId", comment.getArticleId());
-				
+		template.update(sql, param);
+	}
+	
+	/**
+	 * 記事IDからコメントを削除する.
+	 * 
+	 * @param articleId 記事ID
+	 */
+	public void deleteById(int articleId) {
+		String sql="delete from "+TABLE_NAME+" where article_id=:articleId";
+		SqlParameterSource param=new MapSqlParameterSource("articleId",articleId);
+		template.update(sql, param);
 	}
 
 }

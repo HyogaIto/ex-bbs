@@ -9,7 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.domain.Article;
+import com.example.demo.domain.Comment;
 import com.example.demo.form.ArticleForm;
+import com.example.demo.form.CommentForm;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.repository.CommentRepository;
 
@@ -61,14 +63,34 @@ public class ArticleController {
 		return "redirect:/bbs/";
 	}
 
+	/**
+	 * コメント投稿を行う.
+	 * 
+	 * @param form 投稿したいコメントの内容
+	 * @return リダイレクト：掲示板画面
+	 */
 	@RequestMapping("insertComment")
-	public String insertComment() {
-		return null;
+	public String insertComment(CommentForm form) {
+		Comment comment = new Comment();
+		BeanUtils.copyProperties(form, comment);
+		comment.setArticleId(Integer.parseInt(form.getArticleId()));
+		commentRepository.insert(comment);
+		return "redirect:/bbs/";
 	}
 
+	/**
+	 * 記事を削除する.
+	 * 
+	 * @param articleId　記事ID
+	 * @return　リダイレクト：掲示板画面
+	 */
 	@RequestMapping("deleteArticle")
-	public String deleteArticle() {
-		return null;
+	public String deleteArticle(String articleId) {
+		commentRepository.deleteById(Integer.parseInt(articleId));
+		articleRepository.deleteById(Integer.parseInt(articleId));
+
+		return "redirect:/bbs/";
+
 	}
 
 }
