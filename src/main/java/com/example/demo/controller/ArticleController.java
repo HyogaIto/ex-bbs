@@ -6,6 +6,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.domain.Article;
@@ -32,6 +35,16 @@ public class ArticleController {
 	@Autowired
 	private CommentRepository commentRepository;
 
+	@ModelAttribute
+	public ArticleForm setUpArticleForm() {
+		return new ArticleForm();
+	}
+
+	@ModelAttribute
+	public CommentForm setUpCommentForm() {
+		return new CommentForm();
+	}
+
 	/**
 	 * 掲示板画面を表示する.
 	 * 
@@ -39,12 +52,9 @@ public class ArticleController {
 	 */
 	@RequestMapping("")
 	public String index(Model model) {
-		List<Article> articles = articleRepository.findAll();
 
-		for (Article article : articles) {
-			article.setCommentList(commentRepository.findByArticleId(article.getId()));
-		}
-
+		List<Article> articles = articleRepository.findAllArticleAndComment();
+		
 		model.addAttribute("articles", articles);
 		return "ex-bbs";
 	}
@@ -56,7 +66,10 @@ public class ArticleController {
 	 * @return リダイレクト：掲示板画面
 	 */
 	@RequestMapping("insertArticle")
-	public String insertArticle(ArticleForm form) {
+	public String insertArticle(@Validated ArticleForm form, BindingResult result,Model model) {
+		if (result.hasErrors()) {
+			return index(model);
+		}
 		Article article = new Article();
 		BeanUtils.copyProperties(form, article);
 		articleRepository.insert(article);
@@ -70,7 +83,10 @@ public class ArticleController {
 	 * @return リダイレクト：掲示板画面
 	 */
 	@RequestMapping("insertComment")
-	public String insertComment(CommentForm form) {
+	public String insertComment(@Validated CommentForm form, BindingResult result,Model model) {
+		if (result.hasErrors()) {
+			return index(model);
+		}
 		Comment comment = new Comment();
 		BeanUtils.copyProperties(form, comment);
 		comment.setArticleId(Integer.parseInt(form.getArticleId()));
@@ -81,12 +97,12 @@ public class ArticleController {
 	/**
 	 * 記事を削除する.
 	 * 
-	 * @param articleId　記事ID
-	 * @return　リダイレクト：掲示板画面
+	 * @param articleId 記事ID（hidden）
+	 * @return リダイレクト：掲示板画面
 	 */
 	@RequestMapping("deleteArticle")
 	public String deleteArticle(String articleId) {
-		commentRepository.deleteById(Integer.parseInt(articleId));
+		// commentRepository.deleteByArticleId(Integer.parseInt(articleId));
 		articleRepository.deleteById(Integer.parseInt(articleId));
 
 		return "redirect:/bbs/";

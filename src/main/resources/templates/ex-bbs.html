@@ -5,43 +5,57 @@
 <title>ex-bbs</title>
 </head>
 <body>
-<form th:action="@{/bbs/insertArticle}" method="post">
-投稿者名：<input type="text" name="name"><br>
-投稿内容：<textarea rows="10" cols="30" name="content"></textarea>
-<br>
-<button>記事投稿</button>
-</form>
-<hr>
+	<form th:action="@{/bbs/insertArticle}" method="post" th:object="${articleForm}">
+	<div th:errors="*{name}" style="color:red"></div>
+		投稿者名：<input type="text" name="name" th:field="*{name}"><br> 
+	<div th:errors="*{content}" style="color:red"></div>
+		投稿内容：<textarea rows="10" cols="30" name="content" th:field="*{content}"></textarea>
+		<br>
+		<button>記事投稿</button>
+	</form>
+	<hr>
 
-<div th:each="article:${articles}">
-投稿者名：<span th:text="${article.name}"></span><br>
-投稿内容：<div th:text="${article.content}"></div>
-<br>
-<form th:action="@{/bbs/deleteArticle}">
-<input type="hidden" name="articleId" th:value="${article.id}">
-<button>記事削除</button>
-</form>
+	<div th:each="article:${articles}">
+		投稿者名：<span th:text="${article.name}"></span><br> 投稿内容：
+		<div th:text="${article.content}"></div>
+		<br>
+		<form th:action="@{/bbs/deleteArticle}">
+			<input type="hidden" name="articleId" th:value="${article.id}">
+			<button>記事削除</button>
+		</form>
 
-<div th:each="comment:${article.commentList}">
-コメント者名：<span th:text="${comment.name}"></span><br>
-<div>コメント内容：</div>
-<div><strong th:text="${comment.content}"></strong></div>
-<br>
-</div>
+		<div th:each="comment:${article.commentList}">
+			コメント者名：<span th:text="${comment.name}"></span><br>
+			<div>コメント内容：</div>
+			<div>
+				<strong th:text="${comment.content}"></strong>
+			</div>
+			<br>
+		</div>
 
-<form th:action="@{/bbs/insertComment}" method="post">
-<input type="hidden" name="articleId" th:value=${article.id}>
-<div>名前:</div>
-<input type="text" name="name">
-<div>コメント：</div>
-<textarea rows="7" cols="20" name="content"></textarea> <br>
-<button>コメント投稿</button>
-</form>
+		<form th:action="@{/bbs/insertComment}" method="post" th:object="${commentForm}">
+		
+			<input type="hidden" name="articleId" th:value=${article.id}>
+			
+			<div th:if="${article.id == commentForm.intArticleId}">
+			<span th:errors="*{name}"  style="color:red"></span>
+			</div>
+			<div>名前:</div>
+			<input type="text" name="name"  th:field="*{name}">
+			<div th:if="${article.id == commentForm.intArticleId}">
+			<span th:errors="*{content}" style="color:red"></span>
+			</div>
+			
+			<div>コメント：</div>
+			<textarea rows="7" cols="20" name="content" th:field="*{content}"></textarea>
+			<br>
+			<button>コメント投稿</button>
+		</form>
 
 
 
-<hr>
-</div>
+		<hr>
+	</div>
 
 
 </body>
